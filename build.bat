@@ -1,7 +1,7 @@
 @echo off
 
 rem Setup VS vars
-pushd "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64"
+pushd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
 call vcvars64.bat
 popd
 
@@ -10,7 +10,7 @@ set /a has_error=0
 
 rem C COMPILING
 echo -- Building C --
-set FLAGS=/c /JMC /permissive- /GS /analyze- /W3 /Zc:wchar_t /ZI /Gm- /Od /sdl /Zc:inline /fp:precise /D "_MBCS" /errorReport:prompt /WX- /Zc:forScope /RTC1 /Gd /Oy- /MDd /FC /EHsc /nologo /diagnostics:classic
+set FLAGS=/c /analyze- /W3 /Gm- /Od /WX- /nologo
 
 pushd src
 for %%f in (*.c) do (
@@ -51,7 +51,8 @@ rem Don't continue if we have errors
 if !has_error!==1 goto fail
 
 rem LINKING
-set FLAGS=/MANIFEST /NXCOMPAT /DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" "ucrtd.lib" "vcruntimed.lib" "msvcrtd.lib" /DEBUG:FASTLINK /MACHINE:X86 /INCREMENTAL /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /ERRORREPORT:PROMPT /NOLOGO /TLBID:1
+set LIBS=/defaultlib:kernel32.lib /defaultlib:user32.lib /defaultlib:ucrt.lib /defaultlib:vcruntime.lib /defaultlib:msvcrt.lib /defaultlib:gdi32.lib
+set FLAGS=/nologo /subsystem:console /debug:fastlink
 
 echo -- Link --
 set link_files=
@@ -60,7 +61,7 @@ for %%f in (*.obj) do (
 	set link_files=!link_files! %%f
 )
 
-link !link_files! !FLAGS! /nologo /out:..\bin\game.exe /entry:main /subsystem:console /machine:x64
+link !link_files! !LIBS! !FLAGS! /out:..\bin\game.exe /entry:main
 popd
 
 echo.
